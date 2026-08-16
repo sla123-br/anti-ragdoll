@@ -16,54 +16,54 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = coreGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 200, 0, 100)
-frame.Position = UDim2.new(0.5, -100, 0.2, 0)
+frame.Size = UDim2.new(0, 180, 0, 90)
+frame.Position = UDim2.new(0.5, -90, 0.2, 0)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 frame.BackgroundTransparency = 0.15
 frame.BorderSizePixel = 0
 frame.Parent = screenGui
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
 local titleBar = Instance.new("Frame")
-titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.Size = UDim2.new(1, 0, 0, 27)
 titleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
 titleBar.BackgroundTransparency = 0.3
 titleBar.BorderSizePixel = 0
 titleBar.Parent = frame
-Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 10)
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -40, 1, 0)
-title.Position = UDim2.new(0, 10, 0, 0)
+title.Size = UDim2.new(1, -36, 1, 0)
+title.Position = UDim2.new(0, 9, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "⚡ Anti-Ragdoll"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 16
+title.TextSize = 14
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Font = Enum.Font.GothamBold
 title.Parent = titleBar
 
 local toggleBtn = Instance.new("ImageButton")
-toggleBtn.Size = UDim2.new(0, 50, 0, 26)
-toggleBtn.Position = UDim2.new(1, -60, 0, 2)
+toggleBtn.Size = UDim2.new(0, 45, 0, 23)
+toggleBtn.Position = UDim2.new(1, -53, 0, 2)
 toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 80)
 toggleBtn.Parent = titleBar
 Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1, 0)
 
 local toggleBall = Instance.new("Frame")
-toggleBall.Size = UDim2.new(0, 20, 0, 20)
-toggleBall.Position = UDim2.new(0, 2, 0, 3)
+toggleBall.Size = UDim2.new(0, 18, 0, 18)
+toggleBall.Position = UDim2.new(0, 2, 0, 2)
 toggleBall.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 toggleBall.Parent = toggleBtn
 Instance.new("UICorner", toggleBall).CornerRadius = UDim.new(1, 0)
 
 local statusText = Instance.new("TextLabel")
-statusText.Size = UDim2.new(1, -20, 0, 20)
-statusText.Position = UDim2.new(0, 10, 1, -30)
+statusText.Size = UDim2.new(1, -18, 0, 18)
+statusText.Position = UDim2.new(0, 9, 1, -27)
 statusText.BackgroundTransparency = 1
 statusText.Text = "✅ ATIVO"
 statusText.TextColor3 = Color3.fromRGB(0, 255, 100)
-statusText.TextSize = 12
+statusText.TextSize = 11
 statusText.TextXAlignment = Enum.TextXAlignment.Left
 statusText.Font = Enum.Font.Gotham
 statusText.Parent = frame
@@ -74,7 +74,7 @@ toggleBtn.MouseButton1Click:Connect(function()
     ativo = not ativo
     
     local btnColor = ativo and Color3.fromRGB(0, 200, 80) or Color3.fromRGB(200, 50, 50)
-    local ballPos = ativo and UDim2.new(0, 2, 0, 3) or UDim2.new(0, 28, 0, 3)
+    local ballPos = ativo and UDim2.new(0, 2, 0, 2) or UDim2.new(0, 25, 0, 2)
     local textColor = ativo and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(255, 80, 80)
     
     statusText.Text = ativo and "✅ ATIVO" or "❌ DESATIVADO"
