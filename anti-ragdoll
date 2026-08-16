@@ -7,7 +7,6 @@ local ativo = true
 local dragando = false
 local dragOffset = Vector2.new()
 local recuperando = false
-local lastVelocity = Vector3.zero
 
 local coreGui = game:GetService("CoreGui") or player:WaitForChild("PlayerGui")
 local screenGui = Instance.new("ScreenGui")
@@ -138,26 +137,8 @@ local function removerRagdoll(char, humanoid, rootPart)
     recuperando = false
 end
 
-local function monitorarForcas(char)
-    char.DescendantAdded:Connect(function(descendant)
-        if not ativo or recuperando then return end
-        if descendant.Parent and (descendant.Parent:IsA("Tool") or descendant.Parent:IsA("Accessory")) then return end
-        
-        if descendant:IsA("BodyMover") or descendant:IsA("LinearVelocity") or descendant:IsA("VectorForce") or descendant:IsA("BodyVelocity") then
-            local humanoid = char:FindFirstChildOfClass("Humanoid")
-            local rootPart = char:FindFirstChild("HumanoidRootPart")
-            if humanoid and rootPart then
-                removerRagdoll(char, humanoid, rootPart)
-            end
-        end
-    end)
-end
-
-if player.Character then monitorarForcas(player.Character) end
-player.CharacterAdded:Connect(monitorarForcas)
-
 runService.Heartbeat:Connect(function()
-    if not ativo then return end
+    if not ativo or recuperando then return end
     local char = player.Character
     if not char then return end
     local humanoid = char:FindFirstChildOfClass("Humanoid")
@@ -169,19 +150,5 @@ runService.Heartbeat:Connect(function()
        humanoid:GetState() == Enum.HumanoidStateType.Ragdoll or
        humanoid.Sit then
         removerRagdoll(char, humanoid, rootPart)
-        return
-    end
-
-    if not recuperando then
-        local currentVel = rootPart.AssemblyLinearVelocity
-        local deltaX = math.abs(currentVel.X - lastVelocity.X)
-        local deltaZ = math.abs(currentVel.Z - lastVelocity.Z)
-        
-        if deltaX > 50 or deltaZ > 50 then
-            removerRagdoll(char, humanoid, rootPart)
-        end
-        lastVelocity = currentVel
-    else
-        lastVelocity = Vector3.zero
     end
 end)
