@@ -4,6 +4,7 @@ local runService = game:GetService("RunService")
 local tweenService = game:GetService("TweenService")
 
 local ativo = true
+local modoHitDeitado = false
 local dragando = false
 local dragOffset = Vector2.new()
 local recuperando = false
@@ -16,8 +17,8 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = coreGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 200, 0, 100)
-frame.Position = UDim2.new(0.5, -100, 0.2, 0)
+frame.Size = UDim2.new(0, 190, 0, 120)
+frame.Position = UDim2.new(0.5, -95, 0.2, 0)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 frame.BackgroundTransparency = 0.15
 frame.BorderSizePixel = 0
@@ -38,35 +39,52 @@ title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "⚡ Anti-Ragdoll"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 16
+title.TextSize = 15
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Font = Enum.Font.GothamBold
 title.Parent = titleBar
 
 local toggleBtn = Instance.new("ImageButton")
-toggleBtn.Size = UDim2.new(0, 50, 0, 26)
-toggleBtn.Position = UDim2.new(1, -60, 0, 2)
+toggleBtn.Size = UDim2.new(0, 46, 0, 24)
+toggleBtn.Position = UDim2.new(1, -56, 0, 3)
 toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 80)
 toggleBtn.Parent = titleBar
 Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1, 0)
 
 local toggleBall = Instance.new("Frame")
-toggleBall.Size = UDim2.new(0, 20, 0, 20)
-toggleBall.Position = UDim2.new(0, 2, 0, 3)
+toggleBall.Size = UDim2.new(0, 18, 0, 18)
+toggleBall.Position = UDim2.new(0, 3, 0, 3)
 toggleBall.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 toggleBall.Parent = toggleBtn
 Instance.new("UICorner", toggleBall).CornerRadius = UDim.new(1, 0)
 
 local statusText = Instance.new("TextLabel")
 statusText.Size = UDim2.new(1, -20, 0, 20)
-statusText.Position = UDim2.new(0, 10, 1, -30)
+statusText.Position = UDim2.new(0, 10, 0, 34)
 statusText.BackgroundTransparency = 1
 statusText.Text = "✅ ATIVO"
 statusText.TextColor3 = Color3.fromRGB(0, 255, 100)
-statusText.TextSize = 12
+statusText.TextSize = 11
 statusText.TextXAlignment = Enum.TextXAlignment.Left
 statusText.Font = Enum.Font.Gotham
 statusText.Parent = frame
+
+local modeBtn = Instance.new("TextButton")
+modeBtn.Size = UDim2.new(1, -20, 0, 26)
+modeBtn.Position = UDim2.new(0, 10, 0, 62)
+modeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+modeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+modeBtn.TextSize = 11
+modeBtn.Font = Enum.Font.GothamBold
+modeBtn.Text = "Modo: Em Pé"
+modeBtn.Parent = frame
+Instance.new("UICorner", modeBtn).CornerRadius = UDim.new(0, 8)
+
+modeBtn.MouseButton1Click:Connect(function()
+    modoHitDeitado = not modoHitDeitado
+    modeBtn.Text = modoHitDeitado and "Modo: Deitado" or "Modo: Em Pé"
+    modeBtn.BackgroundColor3 = modoHitDeitado and Color3.fromRGB(80, 40, 120) or Color3.fromRGB(40, 40, 60)
+end)
 
 local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
@@ -74,7 +92,7 @@ toggleBtn.MouseButton1Click:Connect(function()
     ativo = not ativo
     
     local btnColor = ativo and Color3.fromRGB(0, 200, 80) or Color3.fromRGB(200, 50, 50)
-    local ballPos = ativo and UDim2.new(0, 2, 0, 3) or UDim2.new(0, 28, 0, 3)
+    local ballPos = ativo and UDim2.new(0, 3, 0, 3) or UDim2.new(0, 25, 0, 3)
     local textColor = ativo and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(255, 80, 80)
     
     statusText.Text = ativo and "✅ ATIVO" or "❌ DESATIVADO"
@@ -109,31 +127,33 @@ local function limparForcas(char)
             v:Destroy()
         end
     end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if root then
-        root.AssemblyLinearVelocity = Vector3.zero
-        root.AssemblyAngularVelocity = Vector3.zero
-    end
 end
 
-local function removerRagdoll(char, humanoid, rootPart)
+local function processarHit(char, humanoid, rootPart)
     if recuperando then return end
     recuperando = true
 
-    rootPart.Anchored = true
-    limparForcas(char)
-    
-    task.wait(1.5)
-    
-    humanoid.Sit = false
-    humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-    
-    rootPart.Anchored = false
-    limparForcas(char) 
-    rootPart.AssemblyLinearVelocity = Vector3.new(0, -5, 0)
-    
-    task.wait(0.05)
-    humanoid:ChangeState(Enum.HumanoidStateType.Running)
+    if modoHitDeitado then
+        task.wait(1.2)
+        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+        task.wait(0.05)
+        humanoid:ChangeState(Enum.HumanoidStateType.Running)
+    else
+        rootPart.Anchored = true
+        limparForcas(char)
+        
+        task.wait(1.5)
+        
+        humanoid.Sit = false
+        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+        
+        rootPart.Anchored = false
+        limparForcas(char) 
+        rootPart.AssemblyLinearVelocity = Vector3.new(0, -5, 0)
+        
+        task.wait(0.05)
+        humanoid:ChangeState(Enum.HumanoidStateType.Running)
+    end
 
     recuperando = false
 end
@@ -141,11 +161,13 @@ end
 local function monitorarForcas(char)
     char.DescendantAdded:Connect(function(descendant)
         if not ativo or recuperando then return end
+        if descendant.Parent and (descendant.Parent:IsA("Tool") or descendant.Parent:IsA("Accessory")) then return end
+        
         if descendant:IsA("BodyMover") or descendant:IsA("LinearVelocity") or descendant:IsA("VectorForce") or descendant:IsA("BodyVelocity") then
             local humanoid = char:FindFirstChildOfClass("Humanoid")
             local rootPart = char:FindFirstChild("HumanoidRootPart")
             if humanoid and rootPart then
-                removerRagdoll(char, humanoid, rootPart)
+                processarHit(char, humanoid, rootPart)
             end
         end
     end)
@@ -155,31 +177,34 @@ if player.Character then monitorarForcas(player.Character) end
 player.CharacterAdded:Connect(monitorarForcas)
 
 runService.Heartbeat:Connect(function()
-    if not ativo then return end
+    if not ativo or recuperando then return end
     local char = player.Character
     if not char then return end
     local humanoid = char:FindFirstChildOfClass("Humanoid")
     local rootPart = char:FindFirstChild("HumanoidRootPart")
     if not humanoid or not rootPart then return end
     
+    if modoHitDeitado then
+        if humanoid.Sit then
+            humanoid.Sit = false
+        end
+        return
+    end
+
     if humanoid:GetState() == Enum.HumanoidStateType.Physics or 
        humanoid:GetState() == Enum.HumanoidStateType.FallingDown or
        humanoid:GetState() == Enum.HumanoidStateType.Ragdoll or
        humanoid.Sit then
-        removerRagdoll(char, humanoid, rootPart)
+        processarHit(char, humanoid, rootPart)
         return
     end
 
-    if not recuperando then
-        local currentVel = rootPart.AssemblyLinearVelocity
-        local deltaX = math.abs(currentVel.X - lastVelocity.X)
-        local deltaZ = math.abs(currentVel.Z - lastVelocity.Z)
-        
-        if deltaX > 50 or deltaZ > 50 then
-            removerRagdoll(char, humanoid, rootPart)
-        end
-        lastVelocity = currentVel
-    else
-        lastVelocity = Vector3.zero
+    local currentVel = rootPart.AssemblyLinearVelocity
+    local deltaX = math.abs(currentVel.X - lastVelocity.X)
+    local deltaZ = math.abs(currentVel.Z - lastVelocity.Z)
+    
+    if deltaX > 50 or deltaZ > 50 then
+        processarHit(char, humanoid, rootPart)
     end
+    lastVelocity = currentVel
 end)
